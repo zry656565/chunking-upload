@@ -19,11 +19,12 @@
 			url: 'upload.php',
 			buttonSelector: '#upload',
 			fileSelector: '#file',
-			chunkSize: 4 * 1024 * 1024, //4MB
+			singleSize: 4 * 1024 * 1024,    //4MB
+			chunkSize: 4 * 1024 * 1024, 	//4MB
 			afterSuccess: function(total) { console.log('success'); },
 			chunkSuccess: function(i, completeNum, total) {
 				$('#log').html(completeNum + '/' + total);
-				console.log('[index:' + i + '] arrived.');
+				console.log('[index:' + i + '] arrived. ' + completeNum + '/' + total);
 			}
 		});
 	});
