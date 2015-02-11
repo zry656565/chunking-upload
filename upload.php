@@ -17,10 +17,16 @@ if ($_POST['total'] == 1) {
 	$uploaddir = '/Users/Jerry/Dev/uploads/';
 	$uploadfile = $uploaddir . basename($_POST['name']);
 
-	file_put_contents($uploadfile . '_' . $_POST['index'], $_POST['fileData'], FILE_APPEND | LOCK_EX);
+	$buffer = explode(",", $_POST['fileData']);
+	$buffer = $buffer[1];
+	$data = base64_decode($buffer);
+	file_put_contents($uploadfile . '_' . $_POST['index'], $data, FILE_APPEND | LOCK_EX);
 	print_log($_POST['name'] . ' - ' . $_POST['index'] . " arrived.\n");
 
 	//combine those chunks
+	if(file_exists($uploadfile)) {
+		unlink($uploadfile);
+	}
 	$files = scandir($uploaddir);
 	$receivedChunkNum = 0;
 	foreach ($files as $file) {
@@ -30,8 +36,8 @@ if ($_POST['total'] == 1) {
 	}
 	if ($receivedChunkNum == $_POST['total']) {
 		for ($i = 0; $i < $receivedChunkNum; $i++) {
-			$data = file_get_contents($uploadfile . '_' . $i);
-			file_put_contents($uploadfile, $data, FILE_APPEND | LOCK_EX);
+			$buffer = file_get_contents($uploadfile . '_' . $i);
+			file_put_contents($uploadfile, $buffer, FILE_APPEND | LOCK_EX);
 			unlink($uploadfile . '_' . $i);
 		}
 		print_log($_POST['name'] . " upload success\n");

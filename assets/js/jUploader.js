@@ -37,7 +37,6 @@
                     url: options.url,
                     type: 'post',
                     data: form,
-                    async: true,
                     processData: false,
                     contentType: false,
                     success: function () {
@@ -55,19 +54,15 @@
                         end = Math.min(size, start + chunkSize);
 
                     reader.onloadend = function () {
-                        var form = new FormData();
-                        form.append("fileData", reader.result);
-                        form.append("name", name);
-                        form.append("total", chunkNum);
-                        form.append("index", i);
-
                         $.ajax({
                             url: options.url,
                             type: 'post',
-                            data: form,
-                            async: true,
-                            processData: false,
-                            contentType: false,
+                            data: {
+                                fileData: reader.result,
+                                name: name,
+                                total: chunkNum,
+                                index: i
+                            },
                             success: function () {
                                 options.chunkSuccess(i, ++succeed, chunkNum);
                                 if (succeed === chunkNum) {
@@ -76,7 +71,7 @@
                             }
                         });
                     };
-                    reader.readAsBinaryString(file.slice(start, end));
+                    reader.readAsDataURL(file.slice(start, end));
                 }(i));
 
             }
