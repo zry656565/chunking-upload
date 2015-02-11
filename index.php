@@ -16,6 +16,7 @@
 <script>
 	$(function(){
 		$.jUploader({
+			url: 'upload.php',
 			buttonSelector: '#upload',
 			fileSelector: '#file',
 			chunkSize: 4 * 1024 * 1024, //4MB

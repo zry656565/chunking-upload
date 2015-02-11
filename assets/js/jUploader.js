@@ -8,6 +8,7 @@
 (function($) {
     $.jUploader = function(options) {
         options = $.extend({
+            url: '',
             buttonSelector: null,
             fileSelector: null,
             chunkSize: 4 * 1024 * 1024, //default: 4MB
@@ -36,7 +37,7 @@
 
                 (function(i) {
                     $.ajax({
-                        url: 'upload.php',
+                        url: options.url,
                         type: 'post',
                         data: form,
                         async: true,
