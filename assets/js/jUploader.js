@@ -23,7 +23,10 @@
                 size = file.size,
                 succeed = 0,
                 chunkSize = options.chunkSize,
-                chunkNum = Math.ceil(size / chunkSize);
+                chunkNum = Math.ceil(size / chunkSize),
+                begin = Date.now();
+
+            console.log('Upload Begin: ' + new Date(begin).toLocaleTimeString());
 
             // if size of the file is no more than critical size
             if (size <= options.singleSize) {
@@ -40,6 +43,8 @@
                     processData: false,
                     contentType: false,
                     success: function () {
+                        console.log('Upload End: ' + new Date(Date.now()).toLocaleTimeString());
+                        console.log('Takes: ' + (Date.now() - begin) + 'ms');
                         options.afterSuccess(1);
                     }
                 });
@@ -66,6 +71,8 @@
                             success: function () {
                                 options.chunkSuccess(i, ++succeed, chunkNum);
                                 if (succeed === chunkNum) {
+                                    console.log('Upload End: ' + new Date(Date.now()).toLocaleTimeString());
+                                    console.log('Takes: ' + (Date.now() - begin) + 'ms');
                                     options.afterSuccess(chunkNum);
                                 }
                             }
