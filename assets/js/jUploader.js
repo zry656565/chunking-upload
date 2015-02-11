@@ -23,8 +23,7 @@
                 size = file.size,
                 succeed = 0,
                 chunkSize = options.chunkSize,
-                chunkNum = Math.ceil(size / chunkSize),
-                i, start, end, form;
+                chunkNum = Math.ceil(size / chunkSize);
 
             // if size of the file is no more than critical size
             if (size <= options.singleSize) {
@@ -49,32 +48,35 @@
             }
 
             //chunk upload
-            for (i = 0; i < chunkNum; i++) {
-                start = i * chunkSize;
-                end = Math.min(size, start + chunkSize);
-
-                form = new FormData();
-                console.log(file.slice(start, end));
-                form.append("fileData", file.slice(start, end));
-                form.append("name", name);
-                form.append("total", chunkNum);
-                form.append("index", i);
-
+            for (var i = 0; i < chunkNum; i++) {
                 (function(i) {
-                    $.ajax({
-                        url: options.url,
-                        type: 'post',
-                        data: form,
-                        async: true,
-                        processData: false,
-                        contentType: false,
-                        success: function () {
-                            options.chunkSuccess(i, ++succeed, chunkNum);
-                            if (succeed === chunkNum) {
-                                options.afterSuccess(chunkNum);
+                    var reader = new FileReader(),
+                        start = i * chunkSize,
+                        end = Math.min(size, start + chunkSize);
+
+                    reader.onloadend = function () {
+                        var form = new FormData();
+                        form.append("fileData", reader.result);
+                        form.append("name", name);
+                        form.append("total", chunkNum);
+                        form.append("index", i);
+
+                        $.ajax({
+                            url: options.url,
+                            type: 'post',
+                            data: form,
+                            async: true,
+                            processData: false,
+                            contentType: false,
+                            success: function () {
+                                options.chunkSuccess(i, ++succeed, chunkNum);
+                                if (succeed === chunkNum) {
+                                    options.afterSuccess(chunkNum);
+                                }
                             }
-                        }
-                    })
+                        });
+                    };
+                    reader.readAsBinaryString(file.slice(start, end));
                 }(i));
 
             }
