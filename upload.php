@@ -1,11 +1,13 @@
 <?php
 
+define('UPLOAD_DIR', '/Users/Jerry/Dev/uploads/');
+
 function print_log($str) {
-	file_put_contents('/Users/Jerry/Dev/uploads/log', $str, FILE_APPEND | LOCK_EX);
+	file_put_contents(UPLOAD_DIR.'log', $str, FILE_APPEND | LOCK_EX);
 }
 
 if ($_POST['total'] == 1) {
-	$uploaddir = '/Users/Jerry/Dev/uploads/';
+	$uploaddir = UPLOAD_DIR;
 	$uploadfile = $uploaddir . basename($_POST['name']);
 
 	if (move_uploaded_file($_FILES['fileData']['tmp_name'], $uploadfile)) {
@@ -14,7 +16,7 @@ if ($_POST['total'] == 1) {
 		print_log($_POST['name'] . " upload failure\n");
 	}
 } else { //chunk uploading
-	$uploaddir = '/Users/Jerry/Dev/uploads/';
+	$uploaddir = UPLOAD_DIR;
 	$uploadfile = $uploaddir . basename($_POST['name']);
 
 	$buffer = explode(",", $_POST['fileData']);
