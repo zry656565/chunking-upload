@@ -22,7 +22,7 @@ if ($_POST['total'] == 1) {
 	$buffer = explode(",", $_POST['fileData']);
 	$buffer = $buffer[1];
 	$data = base64_decode($buffer);
-	file_put_contents($uploadfile . '_' . $_POST['index'], $data, FILE_APPEND | LOCK_EX);
+	file_put_contents($uploadfile . '_' . $_POST['index'], $data, LOCK_EX);
 	print_log($_POST['name'] . ' - ' . $_POST['index'] . " arrived.\n");
 
 	//combine those chunks
@@ -39,7 +39,7 @@ if ($_POST['total'] == 1) {
 	if ($receivedChunkNum == $_POST['total']) {
 		for ($i = 0; $i < $receivedChunkNum; $i++) {
 			$buffer = file_get_contents($uploadfile . '_' . $i);
-			file_put_contents($uploadfile, $buffer, FILE_APPEND | LOCK_EX);
+			file_put_contents($uploadfile, $buffer, LOCK_EX);
 			unlink($uploadfile . '_' . $i);
 		}
 		print_log($_POST['name'] . " upload success\n");
