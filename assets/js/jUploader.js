@@ -75,52 +75,69 @@
             }
 
             //chunk upload
-            var sending = 0;
-            for (; sending < 4; sending++) {
-                uploadChunk(sending);
-            }
-            function uploadChunk(i) {
-                var reader = new FileReader(),
-                    start = i * chunkSize,
-                    end = Math.min(size, start + chunkSize);
+            $.ajax({
+                url: options.url,
+                type: 'post',
+                data: {
+                    name: name,
+                    clean: true
+                },
+                beforeSend: function() {
+                    log('Scan if there is a file with the same name on server.');
+                },
+                success: function (response) {
+                    log(JSON.parse(response)['info']);
+                    var sending = 0;
+                    for (; sending < Math.min(4, chunkNum); sending++) {
+                        uploadChunk(sending);
+                    }
+                    function uploadChunk(i) {
+                        var reader = new FileReader(),
+                            start = i * chunkSize,
+                            end = Math.min(size, start + chunkSize);
 
-                reader.onloadend = function () {
-                    $.ajax({
-                        url: options.url,
-                        type: 'post',
-                        data: {
-                            fileData: reader.result,
-                            name: name,
-                            total: chunkNum,
-                            index: i
-                        },
-                        beforeSend: function() {
-                            log('[index:' + i + '] begin sending!');
-                            options.beforeSend();
-                        },
-                        success: function (response) {
-                            if (JSON.parse(response)['OK']) {
-                                options.chunkSuccess(i, ++succeed, chunkNum);
-                                if (succeed === chunkNum) {
-                                    log('Upload End: ' + new Date(Date.now()).toLocaleTimeString());
-                                    log('Takes: ' + (Date.now() - begin) + 'ms');
-                                    options.afterSuccess(chunkNum);
+                        reader.onloadend = function () {
+                            $.ajax({
+                                url: options.url,
+                                type: 'post',
+                                data: {
+                                    fileData: reader.result,
+                                    name: name,
+                                    total: chunkNum,
+                                    index: i
+                                },
+                                beforeSend: function() {
+                                    log('[index:' + i + '] begin sending!');
+                                    options.beforeSend();
+                                },
+                                success: function (response) {
+                                    if (JSON.parse(response)['OK']) {
+                                        options.chunkSuccess(i, ++succeed, chunkNum);
+                                        if (succeed === chunkNum) {
+                                            log('Upload End: ' + new Date(Date.now()).toLocaleTimeString());
+                                            log('Takes: ' + (Date.now() - begin) + 'ms');
+                                            options.afterSuccess(chunkNum);
+                                        }
+                                        if (sending < chunkNum) {
+                                            uploadChunk(sending++);
+                                        }
+                                    }
+                                    else {
+                                        log('Upload Error: ' + response);
+                                    }
+                                },
+                                error: function () {
+                                    log('ERROR: cannot connect to server');
                                 }
-                                if (sending < chunkNum) {
-                                    uploadChunk(sending++);
-                                }
-                            }
-                            else {
-                                log('Upload Error: ' + response);
-                            }
-                        },
-                        error: function () {
-                            log('ERROR: cannot connect to server');
-                        }
-                    });
-                };
-                reader.readAsDataURL(file.slice(start, end));
-            }
+                            });
+                        };
+                        reader.readAsDataURL(file.slice(start, end));
+                    }
+                },
+                error: function () {
+                    log('ERROR: cannot connect to server');
+                }
+            });
         });
     };
 }(jQuery));
