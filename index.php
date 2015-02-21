@@ -61,7 +61,7 @@
 			},
 			progress: function(i, percentage) {
 				var $p = $('#progress');
-				if (!$p.find('[index='+ i +']')) {
+				if ($p.find('[index='+ i +']').length === 0) {
 					$p.append('<p index="' + i + '">[index:' + i + '] - progress:' + percentage.toFixed(1) + '%</p>');
 				} else {
 					$p.find('[index='+ i +']').html('[index:' + i + '] - progress:' + percentage.toFixed(1) + '%');
