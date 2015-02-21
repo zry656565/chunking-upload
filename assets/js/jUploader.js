@@ -17,7 +17,8 @@
             parallelRequest: 4,
             beforeSend: function() {},
             afterSuccess: function(total) {},
-            chunkSuccess: function(index, completeNum, total) {}
+            chunkSuccess: function(index, completeNum, total) {},
+            progress: function() {}
         }, options);
 
         function log(content) {
@@ -98,6 +99,16 @@
 
                         reader.onloadend = function () {
                             $.ajax({
+                                xhr: function() {
+                                    var xhr = new window.XMLHttpRequest();
+                                    //Upload progress
+                                    xhr.upload.addEventListener("progress", function(event){
+                                        if (event.lengthComputable) {
+                                            options.progress(i, event.loaded / event.total * 100);
+                                        }
+                                    }, false);
+                                    return xhr;
+                                },
                                 url: options.url,
                                 type: 'post',
                                 data: {
