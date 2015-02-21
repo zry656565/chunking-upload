@@ -57,10 +57,18 @@
                         log(name + ' begin sending!');
                         options.beforeSend();
                     },
-                    success: function () {
-                        log('Upload End: ' + new Date(Date.now()).toLocaleTimeString());
-                        log('Takes: ' + (Date.now() - begin) + 'ms');
-                        options.afterSuccess(1);
+                    success: function (response) {
+                        if (JSON.parse(response)['OK']) {
+                            log('Upload End: ' + new Date(Date.now()).toLocaleTimeString());
+                            log('Takes: ' + (Date.now() - begin) + 'ms');
+                            options.afterSuccess(1);
+                        }
+                        else {
+                            log('Upload Error: ' + response);
+                        }
+                    },
+                    error: function () {
+                        log('Fail to connect to server');
                     }
                 });
                 return;
@@ -90,19 +98,24 @@
                             log('[index:' + i + '] begin sending!');
                             options.beforeSend();
                         },
-                        success: function () {
-                            options.chunkSuccess(i, ++succeed, chunkNum);
-                            if (succeed === chunkNum) {
-                                log('Upload End: ' + new Date(Date.now()).toLocaleTimeString());
-                                log('Takes: ' + (Date.now() - begin) + 'ms');
-                                options.afterSuccess(chunkNum);
+                        success: function (response) {
+                            if (JSON.parse(response)['OK']) {
+                                options.chunkSuccess(i, ++succeed, chunkNum);
+                                if (succeed === chunkNum) {
+                                    log('Upload End: ' + new Date(Date.now()).toLocaleTimeString());
+                                    log('Takes: ' + (Date.now() - begin) + 'ms');
+                                    options.afterSuccess(chunkNum);
+                                }
+                                if (sending < chunkNum) {
+                                    uploadChunk(sending++);
+                                }
                             }
-                            if (sending < chunkNum) {
-                                uploadChunk(sending++);
+                            else {
+                                log('Upload Error: ' + response);
                             }
                         },
-                        error: function (err) {
-                            log(err);
+                        error: function () {
+                            log('Fail to connect to server');
                         }
                     });
                 };
