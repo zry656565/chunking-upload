@@ -1,6 +1,6 @@
 <?php
 
-define('UPLOAD_DIR', '/Users/Jerry/Dev/uploads/');
+define('UPLOAD_DIR', '/var/www/html/data/');
 
 function print_log($str) {
 	$str = date('Y-M-d,H:i:s') . ': ' . $str;
