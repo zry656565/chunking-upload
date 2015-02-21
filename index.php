@@ -56,12 +56,16 @@
 			},
 			chunkSuccess: function(i, completeNum, total) {
 				$('#log').append('[index:' + i + '] arrived. ' + completeNum + '/' + total + '<br />');
+				$('#progress').find('[index='+ i +']').remove();
 				scroll();
 			},
 			progress: function(i, percentage) {
 				var $p = $('#progress');
-				$p.append('[index:' + i + '] - progress:' + percentage.toFixed(1) + '%<br/>');
-				$p[0].scrollTop = $p[0].scrollHeight;
+				if (!$p.find('[index='+ i +']')) {
+					$p.append('<p index="' + i + '">[index:' + i + '] - progress:' + percentage.toFixed(1) + '%</p>');
+				} else {
+					$p.find('[index='+ i +']').html('[index:' + i + '] - progress:' + percentage.toFixed(1) + '%');
+				}
 			}
 		});
 

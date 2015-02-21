@@ -49,6 +49,16 @@
                 form.append("index", 0);
 
                 $.ajax({
+                    xhr: function() {
+                        var xhr = new window.XMLHttpRequest();
+                        //Upload progress
+                        xhr.upload.addEventListener("progress", function(event){
+                            if (event.lengthComputable) {
+                                options.progress(0, event.loaded / event.total * 100);
+                            }
+                        }, false);
+                        return xhr;
+                    },
                     url: options.url,
                     type: 'post',
                     data: form,
