@@ -15,6 +15,7 @@
             singleSize: 4 * 1024 * 1024,    //default: 4MB
             chunkSize: 4 * 1024 * 1024,     //default: 4MB
             parallelRequest: 4,
+            beforeSend: function() {},
             afterSuccess: function(total) {},
             chunkSuccess: function(index, completeNum, total) {}
         }, options);
@@ -54,6 +55,7 @@
                     contentType: false,
                     beforeSend: function() {
                         log(name + ' begin sending!');
+                        options.beforeSend();
                     },
                     success: function () {
                         log('Upload End: ' + new Date(Date.now()).toLocaleTimeString());
@@ -86,6 +88,7 @@
                         },
                         beforeSend: function() {
                             log('[index:' + i + '] begin sending!');
+                            options.beforeSend();
                         },
                         success: function () {
                             options.chunkSuccess(i, ++succeed, chunkNum);
@@ -97,6 +100,9 @@
                             if (sending < chunkNum) {
                                 uploadChunk(sending++);
                             }
+                        },
+                        error: function (err) {
+                            log(err);
                         }
                     });
                 };

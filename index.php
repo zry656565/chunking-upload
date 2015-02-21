@@ -34,6 +34,9 @@
 			singleSize: 4 * 1024 * 1024,    //4MB
 			chunkSize: 4 * 1024 * 1024, 	//4MB
 			parallelRequest: 4,				//并发的请求数
+			beforeSend: function() {
+				scroll();
+			},
 			afterSuccess: function(total) {
 				$('#log').append('success<br/>');
 				scroll();
