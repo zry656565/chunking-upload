@@ -14,6 +14,7 @@
             fileSelector: null,
             singleSize: 4 * 1024 * 1024,    //default: 4MB
             chunkSize: 4 * 1024 * 1024,     //default: 4MB
+            parallelRequest: 4,
             afterSuccess: function(total) {},
             chunkSuccess: function(index, completeNum, total) {}
         }, options);
@@ -64,38 +65,42 @@
             }
 
             //chunk upload
-            for (var i = 0; i < chunkNum; i++) {
-                (function(i) {
-                    var reader = new FileReader(),
-                        start = i * chunkSize,
-                        end = Math.min(size, start + chunkSize);
+            var sending = 0;
+            for (; sending < 4; sending++) {
+                uploadChunk(sending);
+            }
+            function uploadChunk(i) {
+                var reader = new FileReader(),
+                    start = i * chunkSize,
+                    end = Math.min(size, start + chunkSize);
 
-                    reader.onloadend = function () {
-                        $.ajax({
-                            url: options.url,
-                            type: 'post',
-                            data: {
-                                fileData: reader.result,
-                                name: name,
-                                total: chunkNum,
-                                index: i
-                            },
-                            beforeSend: function() {
-                                log('[index:' + i + '] begin sending!');
-                            },
-                            success: function () {
-                                options.chunkSuccess(i, ++succeed, chunkNum);
-                                if (succeed === chunkNum) {
-                                    log('Upload End: ' + new Date(Date.now()).toLocaleTimeString());
-                                    log('Takes: ' + (Date.now() - begin) + 'ms');
-                                    options.afterSuccess(chunkNum);
-                                }
+                reader.onloadend = function () {
+                    $.ajax({
+                        url: options.url,
+                        type: 'post',
+                        data: {
+                            fileData: reader.result,
+                            name: name,
+                            total: chunkNum,
+                            index: i
+                        },
+                        beforeSend: function() {
+                            log('[index:' + i + '] begin sending!');
+                        },
+                        success: function () {
+                            options.chunkSuccess(i, ++succeed, chunkNum);
+                            if (succeed === chunkNum) {
+                                log('Upload End: ' + new Date(Date.now()).toLocaleTimeString());
+                                log('Takes: ' + (Date.now() - begin) + 'ms');
+                                options.afterSuccess(chunkNum);
                             }
-                        });
-                    };
-                    reader.readAsDataURL(file.slice(start, end));
-                }(i));
-
+                            if (sending < chunkNum) {
+                                uploadChunk(sending++);
+                            }
+                        }
+                    });
+                };
+                reader.readAsDataURL(file.slice(start, end));
             }
         });
     };
