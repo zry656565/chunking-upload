@@ -3,6 +3,7 @@
 define('UPLOAD_DIR', '/Users/Jerry/Dev/uploads/');
 
 function print_log($str) {
+	$str = date('Y-M-d,H:i:s') . ': ' . $str;
 	file_put_contents(UPLOAD_DIR.'log', $str, FILE_APPEND | LOCK_EX);
 }
 
@@ -26,7 +27,10 @@ if ($_POST['clean'] == true) {
 	}
 }
 
-if ($_POST['total'] == 1) {
+if ($_POST['name'] == '') {
+	print_log("uploading abort.\n");
+	die('{"OK": 0, "info": "Uploading abort."}');
+} else if ($_POST['total'] == 1) {
 	$uploaddir = UPLOAD_DIR;
 	$uploadfile = $uploaddir . basename($_POST['name']);
 
