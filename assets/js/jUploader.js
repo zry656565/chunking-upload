@@ -68,7 +68,7 @@
                         }
                     },
                     error: function () {
-                        log('Fail to connect to server');
+                        log('ERROR: cannot connect to server');
                     }
                 });
                 return;
@@ -115,7 +115,7 @@
                             }
                         },
                         error: function () {
-                            log('Fail to connect to server');
+                            log('ERROR: cannot connect to server');
                         }
                     });
                 };
