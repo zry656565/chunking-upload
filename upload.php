@@ -12,8 +12,10 @@ if ($_POST['total'] == 1) {
 
 	if (move_uploaded_file($_FILES['fileData']['tmp_name'], $uploadfile)) {
 		print_log($_POST['name'] . " upload success\n");
+		die('{"OK": 1, "info": "'. $_POST['name'] . " upload success" .'"}');
 	} else {
 		print_log($_POST['name'] . " upload failure\n");
+		die('{"OK": 0, "info": "Failed to move uploaded file."}');
 	}
 } else { //chunk uploading
 	$uploaddir = UPLOAD_DIR;
@@ -43,5 +45,8 @@ if ($_POST['total'] == 1) {
 			unlink($uploadfile . '_' . $i);
 		}
 		print_log($_POST['name'] . " upload success\n");
+		die('{"OK": 1, "info": "'. $_POST['name'] . " upload success" .'"}');
+	} else {
+		die('{"OK": 1, "info": "'. $_POST['name'] . ' - ' . $_POST['index'] . " arrived." .'"}');
 	}
 }
