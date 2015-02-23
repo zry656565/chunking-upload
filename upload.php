@@ -34,6 +34,11 @@ if ($_POST['name'] == '') {
 	$uploaddir = UPLOAD_DIR;
 	$uploadfile = $uploaddir . basename($_POST['name']);
 
+	//if exists, delete it first
+	if(file_exists($uploadfile)) {
+		unlink($uploadfile);
+	}
+
 	if (move_uploaded_file($_FILES['fileData']['tmp_name'], $uploadfile)) {
 		print_log($_POST['name'] . " upload success\n");
 		die('{"OK": 1, "info": "'. $_POST['name'] . " upload success" .'"}');

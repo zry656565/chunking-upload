@@ -85,7 +85,7 @@
                 return;
             }
 
-            //chunk upload
+            //if exist files with same name, delete them.
             $.ajax({
                 url: options.url,
                 type: 'post',
@@ -98,6 +98,9 @@
                 },
                 success: function (response) {
                     log(JSON.parse(response)['info']);
+                    begin = Date.now();
+
+                    //chunk upload
                     var sending = 0;
                     for (; sending < Math.min(4, chunkNum); sending++) {
                         uploadChunk(sending);
